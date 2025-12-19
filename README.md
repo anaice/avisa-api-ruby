@@ -2,6 +2,8 @@
 
 Ruby client for [AvisaAPI](https://avisaapi.com.br) WhatsApp integration.
 
+WIP - Work in Progress
+
 ## Features
 
 - Send text messages, images, documents, audio, video, and location
