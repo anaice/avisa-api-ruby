@@ -3,7 +3,7 @@
 require_relative 'lib/avisa_api/version'
 
 Gem::Specification.new do |spec|
-  spec.name = 'avisa-api-ruby'
+  spec.name = 'avisa_api'
   spec.version = AvisaApi::VERSION
   spec.authors = ['Rafael Anaice']
 
