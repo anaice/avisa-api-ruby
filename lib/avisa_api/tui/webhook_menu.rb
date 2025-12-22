@@ -87,19 +87,11 @@ module AvisaApi
           q.validate(%r{\Ahttps?://}, 'Please enter a valid URL starting with http:// or https://')
         end
 
-        events = prompt.multi_select('Select events to receive:', cycle: true) do |menu|
-          menu.choice 'All Events', 'all'
-          menu.choice 'Messages', 'messages'
-          menu.choice 'Message Status', 'message_status'
-          menu.choice 'Connection Status', 'connection'
-          menu.choice 'QR Code', 'qrcode'
-        end
-
         spinner = TTY::Spinner.new("[:spinner] Setting webhook...", format: :dots)
         spinner.auto_spin
 
         begin
-          response = client.webhook.set(url: url, events: events)
+          response = client.webhook.set(url: url)
           spinner.stop
 
           app.send(:show_response, response)

@@ -1,9 +1,9 @@
 PATH
   remote: .
   specs:
-    avisa-api-ruby (0.1.0)
+    avisa_api (0.1.0)
       faraday (>= 1.0, < 3.0)
-      faraday-retry (~> 2.0)
+      faraday-retry (>= 1.0)
       pastel (~> 0.8)
       tty-box (~> 0.7)
       tty-prompt (~> 0.23)
@@ -124,7 +124,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  avisa-api-ruby!
+  avisa_api!
   bundler (~> 2.0)
   pry (~> 0.14)
   rake (~> 13.0)
