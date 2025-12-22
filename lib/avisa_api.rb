@@ -5,6 +5,7 @@ require_relative 'avisa_api/configuration'
 require_relative 'avisa_api/error'
 require_relative 'avisa_api/response'
 require_relative 'avisa_api/client'
+require_relative 'avisa_api/resources/webhook_event'
 
 module AvisaApi
   class << self

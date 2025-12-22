@@ -268,6 +268,86 @@ client.webhook.set(url: 'https://yoursite.com/api/whatsapp/webhook')
 client.webhook.remove
 ```
 
+### Receiving Webhook Events
+
+Use `WebhookEvent` to parse incoming webhook payloads:
+
+```ruby
+# Rails controller example
+class WhatsappWebhookController < ApplicationController
+  skip_before_action :verify_authenticity_token
+
+  def receive
+    event = AvisaApi::Resources::WebhookEvent.new(params.to_unsafe_h)
+
+    if event.message? && !event.from_me?
+      handle_incoming_message(event)
+    end
+
+    head :ok
+  end
+
+  private
+
+  def handle_incoming_message(event)
+    puts "New message from #{event.sender_name} (#{event.phone})"
+    puts "Content: #{event.text}"
+    puts "Message ID: #{event.message_id}"
+    puts "Type: #{event.message_type}"
+
+    # Reply to the message
+    client = AvisaApi::Client.new
+    client.messages.send_text(
+      number: event.phone,
+      message: "Thanks for your message!"
+    )
+  end
+end
+```
+
+#### WebhookEvent Methods
+
+**Event Type:**
+- `event.type` - Event type ("Message", "Status", etc)
+- `event.message?` - Is it a message event?
+- `event.status?` - Is it a status update?
+
+**Sender Info:**
+- `event.phone` - Phone number (e.g., "5541999845097")
+- `event.sender_name` - Contact name (e.g., "Rafael Anaice")
+- `event.sender_jid` - Internal WhatsApp JID
+- `event.reply_to` - Alias for phone (use to reply)
+
+**Message Info:**
+- `event.message_id` - Message ID (for react/reply/delete)
+- `event.message_type` - Type: "text", "image", "document", etc
+- `event.timestamp` - Message timestamp (Time object)
+- `event.from_me?` - Was sent by you?
+- `event.group?` - Is from a group?
+
+**Content:**
+- `event.text` - Text content (for text messages)
+- `event.caption` - Caption (for media messages)
+- `event.content` - Text or caption (whichever is available)
+
+**Media Type Checks:**
+- `event.text?` / `event.image?` / `event.video?`
+- `event.audio?` / `event.document?` / `event.location?`
+- `event.sticker?` / `event.contact?`
+
+**Media Info (raw data):**
+- `event.image_info` / `event.video_info` / `event.audio_info`
+- `event.document_info` / `event.location_info`
+
+**Reply Context:**
+- `event.reply?` - Is this a reply to another message?
+- `event.quoted_message_id` - ID of the quoted message
+
+**Raw Access:**
+- `event.raw_data` - Original payload hash
+- `event.info` - Info hash
+- `event.message` - Message hash
+
 ### Number Validation
 
 ```ruby
