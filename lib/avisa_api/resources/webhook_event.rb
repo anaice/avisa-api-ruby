@@ -20,7 +20,21 @@ module AvisaApi
       # @param data [Hash] Payload recebido no webhook
       def initialize(data)
         @raw_data = data.is_a?(Hash) ? data : {}
-        @event = @raw_data['event'] || @raw_data[:event] || {}
+
+        # O payload pode vir direto ou dentro de 'jsonData'
+        json_data = @raw_data['jsonData'] || @raw_data[:jsonData] || @raw_data
+
+        # Se jsonData for string, fazer parse
+        if json_data.is_a?(String)
+          begin
+            json_data = JSON.parse(json_data)
+          rescue JSON::ParserError
+            json_data = {}
+          end
+        end
+
+        @json_data = json_data
+        @event = json_data['event'] || json_data[:event] || {}
         @info = @event['Info'] || @event[:Info] || {}
         @message = @event['Message'] || @event[:Message] || {}
       end
@@ -32,7 +46,7 @@ module AvisaApi
       # Tipo do evento recebido
       # @return [String] "Message", "Status", etc
       def type
-        @raw_data['type'] || @raw_data[:type]
+        @json_data['type'] || @json_data[:type]
       end
 
       # @return [Boolean] true se é uma mensagem recebida
