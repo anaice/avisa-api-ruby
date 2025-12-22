@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
 
   # Runtime dependencies
   spec.add_dependency 'faraday', '>= 1.0', '< 3.0'
-  spec.add_dependency 'faraday-retry', '~> 2.0'
+  spec.add_dependency 'faraday-retry', '>= 1.0'
 
   # TUI dependencies
   spec.add_dependency 'tty-prompt', '~> 0.23'
