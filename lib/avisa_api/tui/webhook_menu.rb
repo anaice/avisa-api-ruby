@@ -52,22 +52,21 @@ module AvisaApi
             puts pastel.green("\nWebhook Configuration:")
             puts
 
-            if data.is_a?(Hash)
-              if data[:url] || data[:webhook]
-                table = TTY::Table.new do |t|
-                  data.each do |key, value|
-                    t << [pastel.bold(key.to_s), value.to_s]
-                  end
+            if data.is_a?(Hash) && !data.empty?
+              table = TTY::Table.new do |t|
+                data.each do |key, value|
+                  t << [pastel.bold(key.to_s), value.to_s.empty? ? '(empty)' : value.to_s]
                 end
-                puts table.render(:unicode, padding: [0, 1])
-              else
-                puts pastel.yellow("No webhook configured")
               end
+              puts table.render(:unicode, padding: [0, 1])
+            elsif data.is_a?(String) && !data.empty?
+              puts "Webhook URL: #{data}"
             else
-              puts data.inspect
+              puts pastel.yellow("No webhook configured")
             end
           else
             puts pastel.red("\nFailed to get webhook")
+            puts "Status: #{response.status}"
             puts "Body: #{response.body}"
           end
         rescue AvisaApi::Error => e
