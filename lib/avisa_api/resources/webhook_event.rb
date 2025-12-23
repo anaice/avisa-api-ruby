@@ -281,19 +281,25 @@ module AvisaApi
         return nil unless media
 
         {
-          'Url' => media['url'] || media[:url],
-          'DirectPath' => media['directPath'] || media[:directPath],
-          'MediaKey' => media['mediaKey'] || media[:mediaKey],
-          'Mimetype' => media['mimetype'] || media[:mimetype],
-          'FileEncSHA256' => media['fileEncSha256'] || media[:fileEncSha256],
-          'FileSHA256' => media['fileSha256'] || media[:fileSha256],
-          'FileLength' => media['fileLength'] || media[:fileLength]
+          'Url' => media['url'] || media[:url] || media['Url'] || media[:Url] || media['URL'] || media[:URL],
+          'DirectPath' => media['directPath'] || media[:directPath] || media['DirectPath'] || media[:DirectPath],
+          'MediaKey' => media['mediaKey'] || media[:mediaKey] || media['MediaKey'] || media[:MediaKey],
+          'Mimetype' => media['mimetype'] || media[:mimetype] || media['Mimetype'] || media[:Mimetype],
+          'FileEncSHA256' => media['fileEncSha256'] || media[:fileEncSha256] || media['FileEncSHA256'] || media[:FileEncSHA256] || media['fileEncSHA256'] || media[:fileEncSHA256],
+          'FileSHA256' => media['fileSha256'] || media[:fileSha256] || media['FileSHA256'] || media[:FileSHA256] || media['fileSHA256'] || media[:fileSHA256],
+          'FileLength' => media['fileLength'] || media[:fileLength] || media['FileLength'] || media[:FileLength]
         }.compact
       end
 
       # @return [Boolean] true se a mensagem tem mídia para download
       def has_media?
         !current_media_info.nil?
+      end
+
+      # Debug: mostra todas as chaves disponíveis na mídia atual
+      # @return [Array<String>, nil]
+      def media_keys
+        current_media_info&.keys
       end
 
       private
