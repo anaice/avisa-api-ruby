@@ -356,49 +356,70 @@ WhatsApp media (images, audio, video, documents) come encrypted. Use the downloa
 # In your webhook controller
 def receive
   event = AvisaApi::Resources::WebhookEvent.new(params.to_unsafe_h)
+  client = AvisaApi::Client.new
 
   if event.audio?
-    # Download and decrypt the audio
-    response = client.messages.download_audio(event.media_download_payload)
-    if response.success?
-      audio_base64 = response.data[:base64]
-      # Save or process the audio...
-    end
-  end
-
-  if event.image?
-    response = client.messages.download_image(event.media_download_payload)
-    image_base64 = response.data[:base64]
-  end
-
-  if event.video?
-    response = client.messages.download_video(event.media_download_payload)
-    video_base64 = response.data[:base64]
-  end
-
-  if event.document?
-    response = client.messages.download_document(event.media_download_payload)
-    document_base64 = response.data[:base64]
+    download_and_save_media(client, :audio, event)
+  elsif event.image?
+    download_and_save_media(client, :image, event)
+  elsif event.video?
+    download_and_save_media(client, :video, event)
+  elsif event.document?
+    download_and_save_media(client, :document, event)
   end
 
   head :ok
 end
+
+private
+
+def download_and_save_media(client, type, event)
+  response = case type
+             when :audio then client.messages.download_audio(event.media_download_payload)
+             when :image then client.messages.download_image(event.media_download_payload)
+             when :video then client.messages.download_video(event.media_download_payload)
+             when :document then client.messages.download_document(event.media_download_payload)
+             end
+
+  return unless response.success?
+
+  # Response structure: { data: { data: { Data: "data:mimetype;base64,..." } } }
+  data_url = response.data.dig(:data, :data, :Data) || response.data.dig("data", "data", "Data")
+  return unless data_url
+
+  # Remove the "data:mimetype;base64," prefix
+  base64_data = data_url.split(',').last
+  decoded = Base64.decode64(base64_data)
+
+  # Save the file
+  extension = { audio: 'ogg', image: 'jpg', video: 'mp4', document: 'pdf' }[type]
+  File.binwrite("#{type}_#{Time.now.to_i}.#{extension}", decoded)
+end
 ```
 
-You can also manually build the download payload:
+#### Response Structure
 
+The download API returns data in this format:
+
+```json
+{
+  "status": true,
+  "data": {
+    "code": 200,
+    "data": {
+      "Data": "data:audio/ogg; codecs=opus;base64,T2dnUwAC...",
+      "Mimetype": "audio/ogg; codecs=opus"
+    },
+    "success": true
+  }
+}
+```
+
+Access the base64 data:
 ```ruby
-# Using audio_info directly
-audio_data = event.audio_info
-response = client.messages.download_audio({
-  'Url' => audio_data['url'],
-  'DirectPath' => audio_data['directPath'],
-  'MediaKey' => audio_data['mediaKey'],
-  'Mimetype' => audio_data['mimetype'],
-  'FileEncSHA256' => audio_data['fileEncSha256'],
-  'FileSHA256' => audio_data['fileSha256'],
-  'FileLength' => audio_data['fileLength']
-})
+data_url = response.data.dig(:data, :data, :Data)
+base64_only = data_url.split(',').last  # Remove "data:mimetype;base64," prefix
+binary = Base64.decode64(base64_only)
 ```
 
 ### Number Validation
