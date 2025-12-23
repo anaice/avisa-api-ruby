@@ -348,6 +348,59 @@ end
 - `event.info` - Info hash
 - `event.message` - Message hash
 
+### Downloading Media
+
+WhatsApp media (images, audio, video, documents) come encrypted. Use the download methods to decrypt:
+
+```ruby
+# In your webhook controller
+def receive
+  event = AvisaApi::Resources::WebhookEvent.new(params.to_unsafe_h)
+
+  if event.audio?
+    # Download and decrypt the audio
+    response = client.messages.download_audio(event.media_download_payload)
+    if response.success?
+      audio_base64 = response.data[:base64]
+      # Save or process the audio...
+    end
+  end
+
+  if event.image?
+    response = client.messages.download_image(event.media_download_payload)
+    image_base64 = response.data[:base64]
+  end
+
+  if event.video?
+    response = client.messages.download_video(event.media_download_payload)
+    video_base64 = response.data[:base64]
+  end
+
+  if event.document?
+    response = client.messages.download_document(event.media_download_payload)
+    document_base64 = response.data[:base64]
+  end
+
+  head :ok
+end
+```
+
+You can also manually build the download payload:
+
+```ruby
+# Using audio_info directly
+audio_data = event.audio_info
+response = client.messages.download_audio({
+  'Url' => audio_data['url'],
+  'DirectPath' => audio_data['directPath'],
+  'MediaKey' => audio_data['mediaKey'],
+  'Mimetype' => audio_data['mimetype'],
+  'FileEncSHA256' => audio_data['fileEncSha256'],
+  'FileSHA256' => audio_data['fileSha256'],
+  'FileLength' => audio_data['fileLength']
+})
+```
+
 ### Number Validation
 
 ```ruby

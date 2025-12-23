@@ -261,6 +261,52 @@ module AvisaApi
       end
 
       # ========================================
+      # Download de Mídia
+      # ========================================
+
+      # Retorna o payload formatado para download de mídia
+      # Use com client.messages.download_image/video/audio/document
+      #
+      # @return [Hash, nil] Hash com as informações necessárias para download
+      #
+      # @example Download de áudio
+      #   event = AvisaApi::Resources::WebhookEvent.new(params)
+      #   if event.audio?
+      #     response = client.messages.download_audio(event.media_download_payload)
+      #     audio_base64 = response.data[:base64]
+      #   end
+      #
+      def media_download_payload
+        media = current_media_info
+        return nil unless media
+
+        {
+          'Url' => media['url'] || media[:url],
+          'DirectPath' => media['directPath'] || media[:directPath],
+          'MediaKey' => media['mediaKey'] || media[:mediaKey],
+          'Mimetype' => media['mimetype'] || media[:mimetype],
+          'FileEncSHA256' => media['fileEncSha256'] || media[:fileEncSha256],
+          'FileSHA256' => media['fileSha256'] || media[:fileSha256],
+          'FileLength' => media['fileLength'] || media[:fileLength]
+        }.compact
+      end
+
+      # @return [Boolean] true se a mensagem tem mídia para download
+      def has_media?
+        !current_media_info.nil?
+      end
+
+      private
+
+      # Retorna as informações de mídia do tipo atual
+      # @return [Hash, nil]
+      def current_media_info
+        image_info || video_info || audio_info || document_info
+      end
+
+      public
+
+      # ========================================
       # Contexto (para mensagens de resposta)
       # ========================================
 

@@ -209,6 +209,14 @@ module AvisaApi
         post('/message/download/document', media_info)
       end
 
+      # Download de áudio recebido
+      #
+      # @param media_info [Hash] Informações da mídia recebida via webhook
+      # @return [Response]
+      def download_audio(media_info)
+        post('/message/download/audio', media_info)
+      end
+
       private
 
       def format_context_info(context_info)
