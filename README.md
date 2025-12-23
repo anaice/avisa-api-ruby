@@ -1,6 +1,6 @@
 # AvisaApi Ruby Client
 
-Ruby client for [AvisaAPI](https://avisaapi.com.br) WhatsApp integration.
+Ruby client for [AvisaAPI](https://avisaapi.com.br) integration.
 
 WIP - Work in Progress
 
@@ -8,9 +8,9 @@ WIP - Work in Progress
 
 - Send text messages, images, documents, audio, video, and location
 - Send link previews with custom images
-- Manage WhatsApp instance (QR Code, status, connection)
+- Manage Whats instance (QR Code, status, connection)
 - Configure webhooks to receive messages
-- Validate WhatsApp numbers
+- Validate Whats numbers
 - Manage groups
 - Chat actions (typing indicator, archive)
 - Interactive TUI for testing
@@ -247,7 +247,7 @@ puts response.data[:LoggedIn]  # true/false
 
 # Helper method
 if client.instance.connected?
-  puts 'WhatsApp connected!'
+  puts 'WPP connected!'
 end
 
 # Disconnect instance
@@ -262,7 +262,7 @@ response = client.webhook.show
 puts response.data[:webhook]
 
 # Set webhook URL
-client.webhook.set(url: 'https://yoursite.com/api/whatsapp/webhook')
+client.webhook.set(url: 'https://yoursite.com/api/avisa_api/webhook')
 
 # Remove webhook
 client.webhook.remove
@@ -274,7 +274,7 @@ Use `WebhookEvent` to parse incoming webhook payloads:
 
 ```ruby
 # Rails controller example
-class WhatsappWebhookController < ApplicationController
+class AvisaApiWebhookController < ApplicationController
   skip_before_action :verify_authenticity_token
 
   def receive
@@ -313,8 +313,8 @@ end
 - `event.status?` - Is it a status update?
 
 **Sender Info:**
-- `event.phone` - Phone number (e.g., "5541999845097")
-- `event.sender_name` - Contact name (e.g., "Rafael Anaice")
+- `event.phone` - Phone number (e.g., "5511999999999")
+- `event.sender_name` - Contact name (e.g., "John")
 - `event.sender_jid` - Internal WhatsApp JID
 - `event.reply_to` - Alias for phone (use to reply)
 
@@ -352,7 +352,7 @@ end
 
 ### Downloading Media
 
-WhatsApp media (images, audio, video, documents) come encrypted. Use the download methods to decrypt:
+WPP media (images, audio, video, documents) come encrypted. Use the download methods to decrypt:
 
 ```ruby
 # In your webhook controller
@@ -430,12 +430,12 @@ binary = Base64.decode64(base64_only)
 ### Number Validation
 
 ```ruby
-# Check if number has WhatsApp
+# Check if number has WPP
 response = client.validation.check_number(number: '5511999999999')
 if response.data[:exists]
-  puts "WhatsApp found: #{response.data[:jid]}"
+  puts "WPP found: #{response.data[:jid]}"
 else
-  puts 'Number does not have WhatsApp'
+  puts 'Number does not have WPP'
 end
 
 # International number
@@ -527,11 +527,11 @@ response.headers        # Response headers
 
 AvisaAPI has a rate limit of **240 requests per minute**. The client will raise `AvisaApi::RateLimitError` when this limit is exceeded.
 
-**Important:** Sending too many messages in a short period may trigger WhatsApp's anti-spam measures and temporarily restrict your account. Consider implementing delays between messages in production.
+**Important:** Sending too many messages in a short period may trigger WPP's anti-spam measures and temporarily restrict your account. Consider implementing delays between messages in production.
 
 ## Interactive TUI (Terminal User Interface)
 
-The gem includes a full-featured interactive TUI for testing the WhatsApp API directly from your terminal.
+The gem includes a full-featured interactive TUI for testing the API directly from your terminal.
 
 ### Running the TUI
 

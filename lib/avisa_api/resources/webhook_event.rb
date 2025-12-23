@@ -76,24 +76,24 @@ module AvisaApi
       end
 
       # JID alternativo do remetente (formato padrão WhatsApp)
-      # @return [String] ex: "5541999845097@s.whatsapp.net"
+      # @return [String] ex: "5511999999999@s.whatsapp.net"
       def sender_alt_jid
         @info['SenderAlt'] || @info[:SenderAlt]
       end
 
       # Número de telefone do remetente (apenas dígitos com código do país)
-      # @return [String] ex: "5541999845097"
+      # @return [String] ex: "5511999999999"
       def phone
         jid = sender_alt_jid || sender_jid
         jid&.split('@')&.first
       end
 
       # Número formatado para enviar mensagem de resposta
-      # @return [String] ex: "5541999845097"
+      # @return [String] ex: "5511999999999"
       alias reply_to phone
 
       # Nome do contato no WhatsApp (push name)
-      # @return [String] ex: "Rafael Anaice"
+      # @return [String] ex: "John Doe"
       def sender_name
         @info['PushName'] || @info[:PushName]
       end
