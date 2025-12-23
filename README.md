@@ -332,12 +332,14 @@ end
 
 **Media Type Checks:**
 - `event.text?` / `event.image?` / `event.video?`
+- `event.ptv?` / `event.video_note?` - Video message (circular video)
 - `event.audio?` / `event.document?` / `event.location?`
 - `event.sticker?` / `event.contact?`
 
 **Media Info (raw data):**
-- `event.image_info` / `event.video_info` / `event.audio_info`
-- `event.document_info` / `event.location_info`
+- `event.image_info` / `event.video_info` / `event.ptv_info`
+- `event.audio_info` / `event.document_info` / `event.location_info`
+- `event.media_type` - Returns "ptv", "image", "video", etc.
 
 **Reply Context:**
 - `event.reply?` - Is this a reply to another message?
@@ -364,6 +366,8 @@ def receive
     download_and_save_media(client, :image, event)
   elsif event.video?
     download_and_save_media(client, :video, event)
+  elsif event.ptv?  # Video message (circular video)
+    download_and_save_media(client, :ptv, event)
   elsif event.document?
     download_and_save_media(client, :document, event)
   end
@@ -378,6 +382,7 @@ def download_and_save_media(client, type, event)
              when :audio then client.messages.download_audio(event.media_download_payload)
              when :image then client.messages.download_image(event.media_download_payload)
              when :video then client.messages.download_video(event.media_download_payload)
+             when :ptv then client.messages.download_ptv(event.media_download_payload)
              when :document then client.messages.download_document(event.media_download_payload)
              end
 
@@ -392,7 +397,7 @@ def download_and_save_media(client, type, event)
   decoded = Base64.decode64(base64_data)
 
   # Save the file
-  extension = { audio: 'ogg', image: 'jpg', video: 'mp4', document: 'pdf' }[type]
+  extension = { audio: 'ogg', image: 'jpg', video: 'mp4', ptv: 'mp4', document: 'pdf' }[type]
   File.binwrite("#{type}_#{Time.now.to_i}.#{extension}", decoded)
 end
 ```

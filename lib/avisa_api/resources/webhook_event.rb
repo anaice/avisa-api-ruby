@@ -110,10 +110,16 @@ module AvisaApi
       end
       alias id message_id
 
-      # Tipo da mensagem
-      # @return [String] "text", "image", "document", "audio", "video", "location", etc
+      # Tipo da mensagem (campo Type)
+      # @return [String] "text", "media", etc
       def message_type
         @info['Type'] || @info[:Type]
+      end
+
+      # Tipo de mídia específico (campo MediaType)
+      # @return [String, nil] "ptv", "image", "video", "audio", "document", etc
+      def media_type
+        @info['MediaType'] || @info[:MediaType]
       end
 
       # Timestamp da mensagem
@@ -198,8 +204,16 @@ module AvisaApi
 
       # @return [Boolean]
       def video?
-        message_type == 'video' || @message.key?('videoMessage') || @message.key?(:videoMessage)
+        message_type == 'video' || media_type == 'video' ||
+          @message.key?('videoMessage') || @message.key?(:videoMessage)
       end
+
+      # Vídeo de recado (Push to Talk Video / Video Note)
+      # @return [Boolean]
+      def ptv?
+        media_type == 'ptv' || @message.key?('ptvMessage') || @message.key?(:ptvMessage)
+      end
+      alias video_note? ptv?
 
       # @return [Boolean]
       def audio?
@@ -241,6 +255,13 @@ module AvisaApi
       def video_info
         @message['videoMessage'] || @message[:videoMessage]
       end
+
+      # Informações do vídeo de recado (PTV / Video Note)
+      # @return [Hash, nil]
+      def ptv_info
+        @message['ptvMessage'] || @message[:ptvMessage]
+      end
+      alias video_note_info ptv_info
 
       # Informações do áudio (se for mensagem de áudio)
       # @return [Hash, nil]
@@ -307,7 +328,7 @@ module AvisaApi
       # Retorna as informações de mídia do tipo atual
       # @return [Hash, nil]
       def current_media_info
-        image_info || video_info || audio_info || document_info
+        image_info || video_info || ptv_info || audio_info || document_info
       end
 
       public

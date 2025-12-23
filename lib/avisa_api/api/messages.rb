@@ -217,6 +217,16 @@ module AvisaApi
         post('/message/download/audio', media_info)
       end
 
+      # Download de vídeo de recado (PTV / Video Note)
+      # PTV usa o mesmo endpoint de vídeo
+      #
+      # @param media_info [Hash] Informações da mídia recebida via webhook
+      # @return [Response]
+      def download_ptv(media_info)
+        post('/message/download/video', media_info)
+      end
+      alias download_video_note download_ptv
+
       private
 
       def format_context_info(context_info)
